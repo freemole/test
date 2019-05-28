@@ -1,0 +1,84 @@
+
+curl -o /etc/yum.repos.d/CentOS-7.repo http://mirrors.aliyun.com/repo/Centos-7.repo
+curl -o /etc/yum.repos.d/epel-7.repo http://mirrors.aliyun.com/repo/epel-7.repo
+yum clean all
+yum makecache
+
+55-11
+
+yum -y install rsync
+
+vi /etc/rsyncd.conf
+
+uid = root
+gid = root
+use chroot = no
+hosts allow=*
+max connections = 3
+pid file = /var/run/rsyncd.pid
+lock file = /var/run/rsync.lock
+[tongbu]
+path = /whsir
+comment = whsir
+read only = false
+
+/usr/bin/rsync --daemon
+
+
+55-22
+
+cd /usr/local/
+wget http://down.whsir.com/downloads/sersync2.5.4_64bit_binary_stable_final.tar.gz
+tar xzf sersync2.5.4_64bit_binary_stable_final.tar.gz
+rm -rf sersync2.5.4_64bit_binary_stable_final.tar.gz
+mv GNU-Linux-x86/ sersync
+cd sersync
+
+
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<head version="2.5">
+<host hostip="localhost" port="8008"></host>
+<debug start="false"/>
+<fileSystem xfs="false"/>
+<filter start="false">
+<exclude expression="(.*)\.svn"></exclude>
+<exclude expression="(.*)\.gz"></exclude>
+<exclude expression="^info/*"></exclude>
+<exclude expression="^static/*"></exclude>
+</filter>
+<inotify>
+<delete start="true"/>
+<createFolder start="true"/>
+<createFile start="false"/>
+<closeWrite start="true"/>
+<moveFrom start="true"/>
+<moveTo start="true"/>
+<attrib start="false"/>
+<modify start="false"/>
+</inotify>
+ 
+vi /usr/local/sersync/confxml.xml 
+ 
+<sersync>
+<span style="color: #800000;"><localpath watch="/opt/tongbu"></span>
+<span style="color: #800000;"><remote ip="192.168.0.31" name="tongbu"/></span>
+<!--<remote ip="192.168.8.39" name="tongbu"/>-->
+<!--<remote ip="192.168.8.40" name="tongbu"/>-->
+</localpath>
+<rsync>
+<span style="color: #800000;"><commonParams params="-azvP"/></span>
+<auth start="false" users="root" passwordfile="/etc/rsync.pas"/>
+<userDefinedPort start="false" port="874"/><!-- port=874 -->
+<timeout start="false" time="100"/><!-- timeout=100 -->
+<ssh start="false"/>
+</rsync>
+<span style="color: #800000;"><failLog path="/tmp/rsync_fail_log.sh" timeToExecute="15"/><!--default every 60mins execute once--></span>
+<crontab start="false" schedule="600"><!--600mins-->
+<crontabfilter start="false">
+<exclude expression="*.php"></exclude>
+<exclude expression="info/*"></exclude>
+</crontabfilter>
+</crontab>
+<plugin start="false" name="command"/>
+</sersync>
+</head>
